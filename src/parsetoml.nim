@@ -1474,6 +1474,7 @@ proc toTomlString*(value: TomlValueRef): string =
   of TomlValueKind.Float: $value.floatVal
   of TomlValueKind.Bool: $value.boolVal
   of TomlValueKind.Datetime: $value.datetimeVal
+  of TomlValueKind.Date: $value.dateVal
   of TomlValueKind.String: "\"" & value.stringVal & "\""
   of TomlValueKind.Array:
     if value.arrayVal.len == 0:
@@ -1554,6 +1555,15 @@ proc getBool*(n: TomlValueRef, default: bool = false): bool =
   if n.isNil or n.kind != TomlValueKind.Bool: return default
   else: return n.boolVal
 
+proc getDate*(n: TomlValueRef,
+              default = TomlDate(year: 1970, month: 1, day:1)):
+              TomlDate =
+  ## Retrieves the DateTime value of a `TomlValueKind.Date TomlValueRef`.
+  ##
+  ## Returns ``default`` if ``n`` is not a ``TomlValueKind.Date``, or if ``n`` is nil.
+  if n.isNil or n.kind != TomlValueKind.Date: return default
+  else: return n.dateVal
+
 proc getTable*(n: TomlValueRef, default = new(TomlTableRef)): TomlTableRef =
   ## Retrieves the key, value pairs of a `TomlValueKind.Table TomlValueRef`.
   ##
@@ -1593,6 +1603,10 @@ proc `?`*(n: float): TomlValueRef =
 proc `?`*(b: bool): TomlValueRef =
   ## Generic constructor for TOML data. Creates a new `TomlValueKind.Bool TomlValueRef`.
   TomlValueRef(kind: TomlValueKind.Bool, boolVal: b)
+
+proc `?`*(d: TomlDate): TomlValueRef =
+  ## Generic constructor for TOML data. Creates a new `TomlValueKind.Date TomlValueRef`.
+  TomlValueRef(kind: TomlValueKind.Date, dateVal: d)
 
 proc `?`*(keyVals: openArray[tuple[key: string, val: TomlValueRef]]): TomlValueRef =
   ## Generic constructor for TOML data. Creates a new `TomlValueKind.Table TomlValueRef`
